@@ -25,7 +25,7 @@ INSTALLED_APPS = [
 
     'rest_framework',
 
-    'user.apps.UserConfig',
+    'pereval_app.apps.PerevalAppConfig',
 ]
 
 MIDDLEWARE = [
@@ -97,3 +97,6 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 SITE_ID = 1
+
+MEDIA_ROOT = BASE_DIR/'images'
+MEDIA_URL = 'images/'
