@@ -10,7 +10,7 @@ class Pereval(models.Model):
     title = models.CharField(max_length=100)
     other_titles = models.CharField(max_length=100)
     connect = models.CharField(max_length=100)
-    add_time = models.DateTimeField(auto_now_add=True, verbose_name='Time')
+    add_time = models.DateTimeField(verbose_name='Time')
 
     user = models.ForeignKey('PerUser', on_delete=models.CASCADE)
     coords = models.ForeignKey('Cords', on_delete=models.CASCADE)
