@@ -5,6 +5,7 @@ from .models import PerUser, Cords, Level, Pereval, Image
 
 class PerevalSerializer(serializers.Serializer):
 
+    id = serializers.IntegerField(read_only=True)
     beauty_title = serializers.CharField(max_length=100)
     title = serializers.CharField(max_length=100)
     other_titles = serializers.CharField(max_length=100)
