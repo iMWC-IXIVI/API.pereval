@@ -13,15 +13,15 @@ class Pereval(models.Model):
     add_time = models.DateTimeField(auto_now_add=True, verbose_name='Time')
 
     user = models.ForeignKey('PerUser', on_delete=models.CASCADE)
-    coord = models.ForeignKey('Cords', on_delete=models.CASCADE)
+    coords = models.ForeignKey('Cords', on_delete=models.CASCADE)
     level = models.ForeignKey('Level', on_delete=models.CASCADE)
 
 
 class PerUser(models.Model):
     email = models.EmailField(unique=True, max_length=255)
-    surname = models.CharField(max_length=100)
+    fam = models.CharField(max_length=100)
     name = models.CharField(max_length=100)
-    patronymic = models.CharField(max_length=255)
+    otc = models.CharField(max_length=255)
     phone = models.CharField(unique=True)
 
 
@@ -39,5 +39,8 @@ class Level(models.Model):
 
 
 class Image(models.Model):
-    image = models.ImageField()
+
+    data = models.ImageField()
+    title = models.CharField(max_length=100)
+
     pereval = models.ForeignKey('Pereval', on_delete=models.CASCADE)
