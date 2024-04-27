@@ -15,21 +15,23 @@ class SubmitData(views.APIView):
 
         email = request.GET['user__email'][:-1]
         perevals = Pereval.objects.filter(user__email=email)
+
+        if not perevals:
+            return response.Response({'Error': 'Email not found'})
+
         serializer = PerevalSerializer(perevals, many=True).data
-        data_list = []
+
         for data in serializer:
 
             del data['user']
             data['coords'] = CordsSerializer(Cords.objects.get(pk=data['coords'])).data
             data['level'] = LevelSerializer(Level.objects.get(pk=data['level'])).data
-            data['images'] = ImageSerializer(Image.objects.filter(pereval__user__email=email), many=True).data
+            images = data['images'] = ImageSerializer(Image.objects.filter(pereval__user__email=email), many=True).data
 
-            for image in data['images']:
+            for image in images:
                 del image['pereval']
 
-            data_list.append(data)
-
-        return response.Response({email: data_list})
+        return response.Response({email: serializer})
 
     def post(self, request, *args, **kwargs):
 
