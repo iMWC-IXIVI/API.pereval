@@ -13,6 +13,9 @@ class SubmitData(views.APIView):
 
     def get(self, request, *args, **kwargs):
 
+        if not request.GET.get('user__email'):
+            return response.Response({'Error': 'Incorrectly path'})
+
         email = request.GET['user__email'][:-1]
         perevals = Pereval.objects.filter(user__email=email)
 
