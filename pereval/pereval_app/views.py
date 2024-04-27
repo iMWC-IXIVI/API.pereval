@@ -1,4 +1,5 @@
 from django.db import transaction
+from django.core.exceptions import ObjectDoesNotExist
 
 from rest_framework import views, response, status
 
@@ -86,9 +87,13 @@ class SubmitData(views.APIView):
 
 class DetailSubmitData(views.APIView):
     def get(self, request, *args, **kwargs):
+
         pk = kwargs.get('pk')
 
-        pereval = Pereval.objects.get(pk=pk)
+        try:
+            pereval = Pereval.objects.get(pk=pk)
+        except ObjectDoesNotExist:
+            return response.Response({'Error': 'data not found'})
 
         serializer = PerevalSerializer(pereval).data
         serializer['user'] = PerUserSerializer(PerUser.objects.get(pk=serializer['user'])).data
