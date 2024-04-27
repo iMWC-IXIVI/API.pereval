@@ -62,25 +62,19 @@ class SubmitData(views.APIView):
 class DetailSubmitData(views.APIView):
     def get(self, request, *args, **kwargs):
         pk = kwargs.get('pk')
-        email = kwargs.get('email')
 
-        if request.path == f'/submitData/{pk}/':
+        pereval = Pereval.objects.get(pk=pk)
 
-            pereval = Pereval.objects.get(pk=pk)
+        serializer = PerevalSerializer(pereval).data
+        serializer['user'] = PerUserSerializer(PerUser.objects.get(pk=serializer['user'])).data
+        serializer['coords'] = CordsSerializer(Cords.objects.get(pk=serializer['coords'])).data
+        serializer['level'] = LevelSerializer(Level.objects.get(pk=serializer['level'])).data
+        serializer['images'] = ImageSerializer(Image.objects.filter(pereval_id=pk), many=True).data
 
-            serializer = PerevalSerializer(pereval).data
-            serializer['user'] = PerUserSerializer(PerUser.objects.get(pk=serializer['user'])).data
-            serializer['coords'] = CordsSerializer(Cords.objects.get(pk=serializer['coords'])).data
-            serializer['level'] = LevelSerializer(Level.objects.get(pk=serializer['level'])).data
-            serializer['images'] = ImageSerializer(Image.objects.filter(pereval_id=pk), many=True).data
+        for data in serializer['images']:
+            del data['pereval']
 
-            for data in serializer['images']:
-                del data['pereval']
-
-            return response.Response({'data': serializer})
-
-        elif request.path == f'/submitData/&user__email={email}':
-            ...
+        return response.Response({'data': serializer})
 
     def put(self, request, *args, **kwargs):
         pass
