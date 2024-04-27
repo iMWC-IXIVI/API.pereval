@@ -11,6 +11,26 @@ from .constant import NEW
 
 class SubmitData(views.APIView):
 
+    def get(self, request, *args, **kwargs):
+
+        email = request.GET['user__email'][:-1]
+        perevals = Pereval.objects.filter(user__email=email)
+        serializer = PerevalSerializer(perevals, many=True).data
+        data_list = []
+        for data in serializer:
+
+            del data['user']
+            data['coords'] = CordsSerializer(Cords.objects.get(pk=data['coords'])).data
+            data['level'] = LevelSerializer(Level.objects.get(pk=data['level'])).data
+            data['images'] = ImageSerializer(Image.objects.filter(pereval__user__email=email), many=True).data
+
+            for image in data['images']:
+                del image['pereval']
+
+            data_list.append(data)
+
+        return response.Response({email: data_list})
+
     def post(self, request, *args, **kwargs):
 
         try:
@@ -74,7 +94,7 @@ class DetailSubmitData(views.APIView):
         for data in serializer['images']:
             del data['pereval']
 
-        return response.Response({'data': serializer})
+        return response.Response({f'data #{pk}': serializer})
 
     def put(self, request, *args, **kwargs):
         pass
