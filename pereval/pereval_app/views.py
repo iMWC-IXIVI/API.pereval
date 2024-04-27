@@ -5,7 +5,7 @@ from rest_framework import views, response, status
 from .serializers import (PerUserSerializer, CordsSerializer,
                           LevelSerializer, PerevalSerializer,
                           ImageSerializer)
-from .models import PerUser, Cords, Level, Pereval
+from .models import PerUser, Cords, Level, Pereval, Image
 from .constant import NEW
 
 
@@ -61,13 +61,25 @@ class SubmitData(views.APIView):
 class DetailSubmitData(views.APIView):
     def get(self, request, *args, **kwargs):
         pk = kwargs.get('pk')
+        email = kwargs.get('email')
 
-        pereval = Pereval.objects.get(pk=pk)
+        if request.path == f'/submitData/{pk}/':
 
-        serializer = PerevalSerializer(pereval).data
-        serializer['user'] = PerUserSerializer(PerUser.objects.get(pk=serializer['user'])).data
+            pereval = Pereval.objects.get(pk=pk)
 
-        return response.Response({'data': serializer})
+            serializer = PerevalSerializer(pereval).data
+            serializer['user'] = PerUserSerializer(PerUser.objects.get(pk=serializer['user'])).data
+            serializer['coords'] = CordsSerializer(Cords.objects.get(pk=serializer['coords'])).data
+            serializer['level'] = LevelSerializer(Level.objects.get(pk=serializer['level'])).data
+            serializer['images'] = ImageSerializer(Image.objects.filter(pereval_id=pk), many=True).data
+
+            for data in serializer['images']:
+                del data['pereval']
+
+            return response.Response({'data': serializer})
+
+        elif request.path == f'/submitData/&user__email={email}':
+            ...
 
     def put(self, request, *args, **kwargs):
         pass
