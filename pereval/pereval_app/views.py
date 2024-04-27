@@ -64,7 +64,10 @@ class DetailSubmitData(views.APIView):
 
         pereval = Pereval.objects.get(pk=pk)
 
-        return response.Response({'data': PerevalSerializer(pereval).data})
+        serializer = PerevalSerializer(pereval).data
+        serializer['user'] = PerUserSerializer(PerUser.objects.get(pk=serializer['user'])).data
+
+        return response.Response({'data': serializer})
 
     def put(self, request, *args, **kwargs):
         pass

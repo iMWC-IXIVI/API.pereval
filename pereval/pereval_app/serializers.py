@@ -23,6 +23,7 @@ class PerevalSerializer(serializers.Serializer):
 
 class PerUserSerializer(serializers.Serializer):
 
+    id = serializers.IntegerField(read_only=True)
     email = serializers.EmailField(max_length=255)
     fam = serializers.CharField(max_length=100)
     name = serializers.CharField(max_length=100)
@@ -35,6 +36,7 @@ class PerUserSerializer(serializers.Serializer):
 
 class CordsSerializer(serializers.Serializer):
 
+    id = serializers.IntegerField(read_only=True)
     latitude = serializers.FloatField()
     longitude = serializers.FloatField()
     height = serializers.IntegerField()
@@ -45,6 +47,7 @@ class CordsSerializer(serializers.Serializer):
 
 class LevelSerializer(serializers.Serializer):
 
+    id = serializers.IntegerField(read_only=True)
     winter = serializers.CharField(max_length=2, allow_null=True, allow_blank=True)
     summer = serializers.CharField(max_length=2, allow_null=True, allow_blank=True)
     autumn = serializers.CharField(max_length=2, allow_null=True, allow_blank=True)
@@ -56,6 +59,7 @@ class LevelSerializer(serializers.Serializer):
 
 class ImageSerializer(serializers.Serializer):
 
+    id = serializers.IntegerField(read_only=True)
     data = serializers.ImageField()
     title = serializers.CharField(max_length=100)
 
