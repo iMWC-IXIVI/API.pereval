@@ -24,9 +24,10 @@ class SubmitData(views.APIView):
 
         try:
             with transaction.atomic():
-                user_serializer = PerUserSerializer(data=user)
-                user_serializer.is_valid(raise_exception=True)
-                user_serializer.save()
+                if not PerUser.objects.filter(email=user['email']):
+                    user_serializer = PerUserSerializer(data=user)
+                    user_serializer.is_valid(raise_exception=True)
+                    user_serializer.save()
 
                 cords_serializer = CordsSerializer(data=cords)
                 cords_serializer.is_valid(raise_exception=True)
@@ -36,7 +37,7 @@ class SubmitData(views.APIView):
                 level_serializer.is_valid(raise_exception=True)
                 level_serializer.save()
 
-                request.data['user'] = PerUser.objects.last().pk
+                request.data['user'] = PerUser.objects.get(email=user['email']).pk
                 request.data['coords'] = Cords.objects.last().pk
                 request.data['level'] = Level.objects.last().pk
                 request.data['status'] = NEW
