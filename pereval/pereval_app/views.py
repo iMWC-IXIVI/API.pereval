@@ -106,5 +106,54 @@ class DetailSubmitData(views.APIView):
 
         return response.Response({f'data #{pk}': serializer})
 
-    def put(self, request, *args, **kwargs):
-        pass
+    def patch(self, request, *args, **kwargs):
+
+        pk = kwargs.get('pk')
+
+        try:
+            pereval = Pereval.objects.get(pk=pk)
+        except ObjectDoesNotExist:
+            return response.Response({'state': 0,
+                                      'message': 'data not found'})
+
+        if Pereval.objects.get(pk=kwargs['pk']).status != NEW:
+            return response.Response({'state': 0,
+                                      'message': f'status not {NEW}'})
+
+        if request.data.get('user'):
+            del request.data['user']
+
+        if request.data.get('coords'):
+
+            coords = request.data.pop('coords')
+
+            serializer = CordsSerializer(data=coords, instance=pereval.coords, partial=True)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+
+        if request.data.get('level'):
+
+            level = request.data.pop('level')
+
+            serializer = LevelSerializer(data=level, instance=pereval.level, partial=True)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+
+        if request.data.get('images'):
+
+            images = request.data.pop('images')
+            instance = Image.objects.filter(pereval=pk)
+
+            for counter, data in enumerate(images):
+                for instance_counter, instance_data in enumerate(instance):
+                    if counter == instance_counter:
+                        serializer = ImageSerializer(data=data, instance=instance_data, partial=True)
+                        serializer.is_valid(raise_exception=True)
+                        serializer.save()
+
+        serializer = PerevalSerializer(data=request.data, instance=pereval, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        return response.Response({'state': 1,
+                                  'message': 'success'})
