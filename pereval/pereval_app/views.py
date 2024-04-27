@@ -6,6 +6,7 @@ from .serializers import (PerUserSerializer, CordsSerializer,
                           LevelSerializer, PerevalSerializer,
                           ImageSerializer)
 from .models import PerUser, Cords, Level, Pereval
+from .constant import NEW
 
 
 class SubmitData(views.APIView):
@@ -38,6 +39,7 @@ class SubmitData(views.APIView):
                 request.data['user'] = PerUser.objects.last().pk
                 request.data['coords'] = Cords.objects.last().pk
                 request.data['level'] = Level.objects.last().pk
+                request.data['status'] = NEW
                 pereval_serializer = PerevalSerializer(data=request.data)
                 pereval_serializer.is_valid(raise_exception=True)
                 pereval_serializer.save()
@@ -54,3 +56,15 @@ class SubmitData(views.APIView):
         return response.Response(data={'status': status.HTTP_200_OK,
                                        'message': 'Данные сохранены',
                                        'id': PerevalSerializer(Pereval.objects.last()).data['id']})
+
+
+class DetailSubmitData(views.APIView):
+    def get(self, request, *args, **kwargs):
+        pk = kwargs.get('pk')
+
+        pereval = Pereval.objects.get(pk=pk)
+
+        return response.Response({'data': PerevalSerializer(pereval).data})
+
+    def put(self, request, *args, **kwargs):
+        pass
