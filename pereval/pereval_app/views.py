@@ -144,6 +144,11 @@ class DetailSubmitData(views.APIView):
             images = request.data.pop('images')
             instance = Image.objects.filter(pereval=pk)
 
+            if len(images) != len(instance):
+                return response.Response({'state': 0,
+                                          'message': 'Количество загружаемых объектов превышает количество объектов, '
+                                                     'находящихся в базе данных'})
+
             for counter, data in enumerate(images):
                 for instance_counter, instance_data in enumerate(instance):
                     if counter == instance_counter:
