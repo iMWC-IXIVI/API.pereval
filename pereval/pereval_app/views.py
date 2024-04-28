@@ -1,5 +1,8 @@
+import os
+
 from django.db import transaction
 from django.core.exceptions import ObjectDoesNotExist
+from django.conf import settings
 
 from rest_framework import views, response, status
 
@@ -152,6 +155,8 @@ class DetailSubmitData(views.APIView):
             for counter, data in enumerate(images):
                 for instance_counter, instance_data in enumerate(instance):
                     if counter == instance_counter:
+                        if data['data']:
+                            instance_data.data.delete(save=True)
                         serializer = ImageSerializer(data=data, instance=instance_data, partial=True)
                         serializer.is_valid(raise_exception=True)
                         serializer.save()
