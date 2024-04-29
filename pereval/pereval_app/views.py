@@ -2,9 +2,8 @@ import os
 
 from django.db import transaction
 from django.core.exceptions import ObjectDoesNotExist
-from django.conf import settings
 
-from rest_framework import views, response, status
+from rest_framework import views, response, status, renderers
 
 from .serializers import (PerUserSerializer, CordsSerializer,
                           LevelSerializer, PerevalSerializer,
@@ -87,6 +86,9 @@ class SubmitData(views.APIView):
                                        'message': 'Данные сохранены',
                                        'id': PerevalSerializer(Pereval.objects.last()).data['id']})
 
+    def get_serializer_class(self):
+        return PerevalSerializer
+
 
 class DetailSubmitData(views.APIView):
     def get(self, request, *args, **kwargs):
@@ -167,3 +169,6 @@ class DetailSubmitData(views.APIView):
 
         return response.Response({'state': 1,
                                   'message': 'success'})
+
+    def get_serializer_class(self):
+        return PerevalSerializer
