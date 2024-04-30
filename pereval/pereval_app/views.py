@@ -72,7 +72,8 @@ class SubmitData(views.APIView):
 
         return response.Response({email: serializer})
 
-    @extend_schema(request={'multipart/form-data': {'type': 'object',
+    @extend_schema(description='Добавление нового перевала',
+                   request={'multipart/form-data': {'type': 'object',
                                                     'properties': {'beauty_title': {'type': 'string'},
                                                                    'title': {'type': 'string'},
                                                                    'other_titles': {'type': 'string'},
@@ -108,7 +109,24 @@ class SubmitData(views.APIView):
                                                                              },
                                                                    'image': {'type': 'string',
                                                                              'format': 'binary'},
-                                                                   'title_image': {'type': 'string'}}}})
+                                                                   'title_image': {'type': 'string'}}}},
+                   responses=OpenApiResponse(response=PerevalSerializer,
+                                             description='Вывод данных',
+                                             examples=[OpenApiExample(name='return 200',
+                                                                      value={'status': 200,
+                                                                             'message': 'Данные сохранены',
+                                                                             'id': 'Номер добавленного перевала'},
+                                                                      description='Успешное выполнение запроса'),
+                                                       OpenApiExample(name='return 400',
+                                                                      value={'status': 400,
+                                                                             'message': 'Ошибка в названии поля',
+                                                                             'id': None},
+                                                                      description='В случае ошибки в названии поля'),
+                                                       OpenApiExample(name='return 500',
+                                                                      value={'status': 500,
+                                                                             'message': 'Данные не сохранены. Ошибка:',
+                                                                             'id': None},
+                                                                      description='В случае какой-либо ошибки')]))
     def post(self, request, *args, **kwargs):
         import json
 
