@@ -368,24 +368,34 @@ class DetailSubmitData(views.APIView):
 
         data = request.data.copy()
 
-        if data['data'] or data['image_title']:
-            data['images'] = {'data': data.get('data'), 'title': data.get('image_title')}
-            if not data['images']['data']:
-                del data['images']['data']
-            elif not data['images']['title']:
-                del data['images']['title']
+        if not data:
+            return response.Response(data={'status': status.HTTP_400_BAD_REQUEST,
+                                           'message': 'data not entered'},
+                                     status=status.HTTP_400_BAD_REQUEST)
+        try:
+            if data.get('data') or data.get('image_title'):
+                data['images'] = {'data': data.get('data'), 'title': data.get('image_title')}
+                if not data['images']['data']:
+                    del data['images']['data']
+                elif not data['images']['title']:
+                    del data['images']['title']
+        except KeyError as e:
+            return response.Response(data={'status': status.HTTP_400_BAD_REQUEST,
+                                           'message': f'key {e} not found'})
 
         pk = kwargs.get('pk')
 
         try:
             pereval = Pereval.objects.get(pk=pk)
         except ObjectDoesNotExist:
-            return response.Response({'state': 0,
-                                      'message': 'data not found'})
+            return response.Response(data={'status': status.HTTP_500_INTERNAL_SERVER_ERROR,
+                                           'message': 'data not found'},
+                                     status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         if Pereval.objects.get(pk=kwargs['pk']).status != NEW:
-            return response.Response({'state': 0,
-                                      'message': f'status not {NEW}'})
+            return response.Response(data={'status': status.HTTP_400_BAD_REQUEST,
+                                           'message': f'status not {NEW}'},
+                                     status=status.HTTP_400_BAD_REQUEST)
 
         if data.get('user'):
             del data['user']
@@ -401,7 +411,7 @@ class DetailSubmitData(views.APIView):
             serializer.is_valid(raise_exception=True)
             serializer.save()
 
-        if request.data.get('level'):
+        if data.get('level'):
 
             if type(data['level']) is str:
                 level = json.loads(data.pop('level')[0])
@@ -416,6 +426,7 @@ class DetailSubmitData(views.APIView):
 
             images = data.pop('images')
             instance = Image.objects.filter(pereval=pk)
+
             if len(images) != len(instance):
                 return response.Response(data={'status': status.HTTP_500_INTERNAL_SERVER_ERROR,
                                                'message': 'Count data not equal instance'},
@@ -424,7 +435,7 @@ class DetailSubmitData(views.APIView):
             for counter, data in enumerate(images):
                 for instance_counter, instance_data in enumerate(instance):
                     if counter == instance_counter:
-                        if data['data']:
+                        if data.get('data'):
                             instance_data.data.delete(save=True)
                         serializer = ImageSerializer(data=data, instance=instance_data, partial=True)
                         serializer.is_valid(raise_exception=True)
