@@ -1,9 +1,7 @@
-import os
-
 from django.db import transaction
 from django.core.exceptions import ObjectDoesNotExist
 
-from rest_framework import views, response, status, renderers
+from rest_framework import views, response, status
 
 from .serializers import (PerUserSerializer, CordsSerializer,
                           LevelSerializer, PerevalSerializer,
@@ -11,15 +9,50 @@ from .serializers import (PerUserSerializer, CordsSerializer,
 from .models import PerUser, Cords, Level, Pereval, Image
 from .constant import NEW
 
+from drf_spectacular.utils import (extend_schema, OpenApiParameter, OpenApiExample,
+                                   OpenApiResponse, OpenApiTypes, OpenApiRequest)
+
 
 class SubmitData(views.APIView):
 
+    @extend_schema(parameters=[OpenApiParameter(name='user__email',
+                                                description='Введите email пользователя',
+                                                type=OpenApiTypes.EMAIL)],
+                   description='Поиск пользователя по его email!!!',
+                   responses=OpenApiResponse(response=PerevalSerializer,
+                                             description='Пример вывода данных',
+                                             examples=[OpenApiExample(name='Test',
+                                                                      summary='Вывод',
+                                                                      value={'id': 'integer',
+                                                                             'status': 'string',
+                                                                             'beauty_title': 'string',
+                                                                             'title': 'string',
+                                                                             'other_title': 'string',
+                                                                             'add_time': 'datetime',
+                                                                             'coords': {'id': 'integer',
+                                                                                        'latitude': 'float',
+                                                                                        'longitude': 'float',
+                                                                                        'height': 'integer'},
+                                                                             'level': {'winter': 'string',
+                                                                                       'summer': 'string',
+                                                                                       'autumn': 'string',
+                                                                                       'spring': 'string'},
+                                                                             'images': [{'data': 'image',
+                                                                                         'title': 'string'}]
+                                                                             }
+                                                                      )
+                                                       ],
+                                             )
+                   )
     def get(self, request, *args, **kwargs):
+
+        if not request.GET:
+            return response.Response({'Enter path': '?user__email=user_email'})
 
         if not request.GET.get('user__email'):
             return response.Response({'Error': 'Incorrectly path'})
 
-        email = request.GET['user__email'][:-1]
+        email = request.GET['user__email']
         perevals = Pereval.objects.filter(user__email=email)
 
         if not perevals:
@@ -39,13 +72,66 @@ class SubmitData(views.APIView):
 
         return response.Response({email: serializer})
 
+    @extend_schema(request={'multipart/form-data': {'type': 'object',
+                                                    'properties': {'beauty_title': {'type': 'string'},
+                                                                   'title': {'type': 'string'},
+                                                                   'other_titles': {'type': 'string'},
+                                                                   'connect': {'type': 'string'},
+                                                                   'add_time': {'type': 'string',
+                                                                                'format': 'date-time'},
+                                                                   'user': {'type': 'object',
+                                                                            'format': 'byte',
+                                                                            'properties': {'email': {'type': 'string',
+                                                                                                     'format': 'email'},
+                                                                                           'fam': {'type': 'string'},
+                                                                                           'name': {'type': 'string'},
+                                                                                           'otc': {'type': 'string'},
+                                                                                           'phone': {'type': 'string'}
+                                                                                           }
+                                                                            },
+                                                                   'coords': {'type': 'object',
+                                                                              'format': 'byte',
+                                                                              'properties': {'latitude': {'type': 'number',
+                                                                                                          'format': 'float'},
+                                                                                             'longitude': {'type': 'number',
+                                                                                                           'format': 'float'},
+                                                                                             'height': {'type': 'integer'}
+                                                                                             }
+                                                                              },
+                                                                   'level': {'type': 'object',
+                                                                             'format': 'byte',
+                                                                             'properties': {'winter': {'type': 'string'},
+                                                                                            'summer': {'type': 'string'},
+                                                                                            'autumn': {'type': 'string'},
+                                                                                            'spring': {'type': 'string'}
+                                                                                            }
+                                                                             },
+                                                                   'image': {'type': 'string',
+                                                                             'format': 'binary'},
+                                                                   'title_image': {'type': 'string'}}}})
     def post(self, request, *args, **kwargs):
+        import json
 
         try:
-            user = request.data.pop('user')
-            cords = request.data.pop('coords')
-            level = request.data.pop('level')
-            images = request.data.pop('images')
+            if type(request.data['user']) is str:
+
+                user = request.data['user']
+                user = json.loads(user)
+
+                cords = request.data['coords']
+                cords = json.loads(cords)
+
+                level = request.data['level']
+                level = json.loads(level)
+
+                images = [{'data': request.data['image'], 'title': request.data['title_image']}]
+
+            else:
+                user = request.data.pop('user')
+                cords = request.data.pop('coords')
+                level = request.data.pop('level')
+                images = request.data.pop('images')
+            print((type(user), user), (type(cords), cords), (type(level), level), (type(images), images), sep='\n')
         except KeyError as e:
             return response.Response({'status': status.HTTP_400_BAD_REQUEST,
                                       'message': f'Ошибка в названии поля {e}'})
@@ -68,7 +154,6 @@ class SubmitData(views.APIView):
                 request.data['user'] = PerUser.objects.get(email=user['email']).pk
                 request.data['coords'] = Cords.objects.last().pk
                 request.data['level'] = Level.objects.last().pk
-                request.data['status'] = NEW
                 pereval_serializer = PerevalSerializer(data=request.data)
                 pereval_serializer.is_valid(raise_exception=True)
                 pereval_serializer.save()
@@ -85,9 +170,6 @@ class SubmitData(views.APIView):
         return response.Response(data={'status': status.HTTP_200_OK,
                                        'message': 'Данные сохранены',
                                        'id': PerevalSerializer(Pereval.objects.last()).data['id']})
-
-    def get_serializer_class(self):
-        return PerevalSerializer
 
 
 class DetailSubmitData(views.APIView):
@@ -169,6 +251,3 @@ class DetailSubmitData(views.APIView):
 
         return response.Response({'state': 1,
                                   'message': 'success'})
-
-    def get_serializer_class(self):
-        return PerevalSerializer
