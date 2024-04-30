@@ -10,7 +10,7 @@ from .models import PerUser, Cords, Level, Pereval, Image
 from .constant import NEW
 
 from drf_spectacular.utils import (extend_schema, OpenApiParameter, OpenApiExample,
-                                   OpenApiResponse, OpenApiTypes, OpenApiRequest)
+                                   OpenApiResponse, OpenApiTypes)
 
 
 class SubmitData(views.APIView):
@@ -272,7 +272,90 @@ class DetailSubmitData(views.APIView):
 
         return response.Response({f'data #{pk}': serializer})
 
+    @extend_schema(description='Изменение перевала по его уникальному номеру',
+                   request={'multipart/form-data': {'type': 'object',
+                                                    'properties': {'beauty_title': {'type': 'string'},
+                                                                   'title': {'type': 'string'},
+                                                                   'other_titles': {'type': 'string'},
+                                                                   'connect': {'type': 'string'},
+                                                                   'add_time': {'type': 'string',
+                                                                                'format': 'date-time'},
+                                                                   'coords': {'type': 'object',
+                                                                              'format': 'byte',
+                                                                              'properties': {'latitude': {'type': 'number',
+                                                                                                          'format': 'float'},
+                                                                                             'longitude': {'type': 'number',
+                                                                                                           'format': 'float'},
+                                                                                             'height': {'type': 'integer'}
+                                                                                             }
+                                                                              },
+                                                                   'level': {'type': 'object',
+                                                                             'format': 'byte',
+                                                                             'properties': {'winter': {'type': 'string'},
+                                                                                            'summer': {'type': 'string'},
+                                                                                            'autumn': {'type': 'string'},
+                                                                                            'spring': {'type': 'string'}
+                                                                                            }
+                                                                             },
+                                                                   'data': {'type': 'string',
+                                                                            'format': 'binary'},
+                                                                   'image_title': {'type': 'string'}
+                                                                   }
+                                                    }
+                            },
+                   responses=OpenApiResponse(response=PerevalSerializer,
+                                             description='Изменение перевела, поля, типы',
+                                             examples=[OpenApiExample(name='Вывод объяснение',
+                                                                      value={'id': 'Уникальный номер',
+                                                                             'status': 'Статус модерации',
+                                                                             'beauty_title': 'Главное название',
+                                                                             'title': 'Название',
+                                                                             'other_title': 'Альтернативное название',
+                                                                             'connect': 'То что соединяет перевал',
+                                                                             'add_time': 'Время добавления',
+                                                                             'user': 'Добавивший пользователь',
+                                                                             'coords': 'Координаты перевала',
+                                                                             'level': 'Уровень прохождения 2 символа',
+                                                                             'images': 'Список добавленных фотографий'}
+                                                                      ),
+                                                       OpenApiExample(name='Вывод типов данных',
+                                                                      value={'id': 'integer',
+                                                                             'status': 'string',
+                                                                             'beauty_title': 'string',
+                                                                             'title': 'string',
+                                                                             'other_title': 'string',
+                                                                             'connect': 'string',
+                                                                             'add_time': 'datetime',
+                                                                             'user': {'email': 'string email',
+                                                                                      'fam': 'string',
+                                                                                      'name': 'string',
+                                                                                      'otc': 'string',
+                                                                                      'phone': 'string'},
+                                                                             'coords': {'latitude': 'float',
+                                                                                        'longitude': 'float',
+                                                                                        'height': 'integer'},
+                                                                             'level': {'winter': 'string 2 symbol',
+                                                                                       'summer': 'string 2 symbol',
+                                                                                       'autumn': 'string 2 symbol',
+                                                                                       'spring': 'string 2 symbol'},
+                                                                             'images': [{'data': 'File (image)',
+                                                                                         'title': 'string'}]
+                                                                             }
+                                                                      )
+                                                       ]
+                                             )
+                   )
     def patch(self, request, *args, **kwargs):
+        import json
+
+        data = request.data.copy()
+
+        if data['data'] or data['image_title']:
+            data['images'] = {'data': data.get('data'), 'title': data.get('image_title')}
+            if not data['images']['data']:
+                del data['images']['data']
+            elif not data['images']['title']:
+                del data['images']['title']
 
         pk = kwargs.get('pk')
 
@@ -286,30 +369,35 @@ class DetailSubmitData(views.APIView):
             return response.Response({'state': 0,
                                       'message': f'status not {NEW}'})
 
-        if request.data.get('user'):
-            del request.data['user']
+        if data.get('user'):
+            del data['user']
 
-        if request.data.get('coords'):
+        if data.get('coords'):
 
-            coords = request.data.pop('coords')
+            if type(data['coords']) is str:
+                coords = json.loads(data.pop('coords')[0])
+            else:
+                coords = data.pop('coords')
 
             serializer = CordsSerializer(data=coords, instance=pereval.coords, partial=True)
-            serializer.is_valid(raise_exception=True)
+            serializer.is_valid(raise_exception=False)
             serializer.save()
 
         if request.data.get('level'):
 
-            level = request.data.pop('level')
+            if type(data['level']) is str:
+                level = json.loads(data.pop('level')[0])
+            else:
+                level = data.pop('level')
 
             serializer = LevelSerializer(data=level, instance=pereval.level, partial=True)
             serializer.is_valid(raise_exception=True)
             serializer.save()
 
-        if request.data.get('images'):
+        if data.get('images'):
 
-            images = request.data.pop('images')
+            images = data.pop('images')
             instance = Image.objects.filter(pereval=pk)
-
             if len(images) != len(instance):
                 return response.Response({'state': 0,
                                           'message': 'Количество загружаемых объектов превышает количество объектов, '
@@ -324,7 +412,7 @@ class DetailSubmitData(views.APIView):
                         serializer.is_valid(raise_exception=True)
                         serializer.save()
 
-        serializer = PerevalSerializer(data=request.data, instance=pereval, partial=True)
+        serializer = PerevalSerializer(data=data, instance=pereval, partial=True)
         serializer.is_valid(raise_exception=True)
         serializer.save()
 
