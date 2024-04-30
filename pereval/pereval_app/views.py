@@ -64,16 +64,22 @@ class SubmitData(views.APIView):
     def get(self, request, *args, **kwargs):
 
         if not request.GET:
-            return response.Response({'Enter path': '?user__email=user_email'})
+            return response.Response(data={'status': status.HTTP_100_CONTINUE,
+                                           'message': 'enter path: ?user__email=user_email'},
+                                     status=status.HTTP_100_CONTINUE)
 
         if not request.GET.get('user__email'):
-            return response.Response({'Error': 'Incorrectly path'})
+            return response.Response(data={'status': status.HTTP_404_NOT_FOUND,
+                                           'message': 'path incorrectly'},
+                                     status=status.HTTP_404_NOT_FOUND)
 
         email = request.GET['user__email']
         perevals = Pereval.objects.filter(user__email=email)
 
         if not perevals:
-            return response.Response({'Error': 'Email not found'})
+            return response.Response(data={'status': status.HTTP_500_INTERNAL_SERVER_ERROR,
+                                           'message': 'Email not found'},
+                                     status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         serializer = PerevalSerializer(perevals, many=True).data
 
@@ -87,7 +93,11 @@ class SubmitData(views.APIView):
             for image in images:
                 del image['pereval']
 
-        return response.Response({email: serializer})
+        return response.Response(data={email: serializer,
+                                       'status': status.HTTP_200_OK,
+                                       'message': 'Success',
+                                       'result': {email: serializer}},
+                                 status=status.HTTP_200_OK)
 
     @extend_schema(description='Добавление нового перевала',
                    request={'multipart/form-data': {'type': 'object',
@@ -168,8 +178,9 @@ class SubmitData(views.APIView):
                 images = request.data.pop('images')
             print((type(user), user), (type(cords), cords), (type(level), level), (type(images), images), sep='\n')
         except KeyError as e:
-            return response.Response({'status': status.HTTP_400_BAD_REQUEST,
-                                      'message': f'Ошибка в названии поля {e}'})
+            return response.Response(data={'status': status.HTTP_400_BAD_REQUEST,
+                                           'message': f'Error field {e}'},
+                                     status=status.HTTP_400_BAD_REQUEST)
 
         try:
             with transaction.atomic():
@@ -199,12 +210,14 @@ class SubmitData(views.APIView):
                     image_serializer.is_valid()
                     image_serializer.save()
         except Exception as e:
-            return response.Response({'status': status.HTTP_500_INTERNAL_SERVER_ERROR,
-                                      'message': f'Данные не сохранены. Ошибка: {e}'})
+            return response.Response(data={'status': status.HTTP_500_INTERNAL_SERVER_ERROR,
+                                           'message': f'Data does not save. Error: {e}'},
+                                     status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         return response.Response(data={'status': status.HTTP_200_OK,
-                                       'message': 'Данные сохранены',
-                                       'id': PerevalSerializer(Pereval.objects.last()).data['id']})
+                                       'message': 'Success',
+                                       'id': PerevalSerializer(Pereval.objects.last()).data['id']},
+                                 status=status.HTTP_200_OK)
 
 
 class DetailSubmitData(views.APIView):
@@ -259,7 +272,9 @@ class DetailSubmitData(views.APIView):
         try:
             pereval = Pereval.objects.get(pk=pk)
         except ObjectDoesNotExist:
-            return response.Response({'Error': 'data not found'})
+            return response.Response(data={'status': status.HTTP_500_INTERNAL_SERVER_ERROR,
+                                           'message': 'data not found'},
+                                     status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         serializer = PerevalSerializer(pereval).data
         serializer['user'] = PerUserSerializer(PerUser.objects.get(pk=serializer['user'])).data
@@ -270,7 +285,10 @@ class DetailSubmitData(views.APIView):
         for data in serializer['images']:
             del data['pereval']
 
-        return response.Response({f'data #{pk}': serializer})
+        return response.Response(data={'status': status.HTTP_200_OK,
+                                       'message': 'Success',
+                                       'result': {f'data #{pk}': serializer}},
+                                 status=status.HTTP_200_OK)
 
     @extend_schema(description='Изменение перевала по его уникальному номеру',
                    request={'multipart/form-data': {'type': 'object',
@@ -380,7 +398,7 @@ class DetailSubmitData(views.APIView):
                 coords = data.pop('coords')
 
             serializer = CordsSerializer(data=coords, instance=pereval.coords, partial=True)
-            serializer.is_valid(raise_exception=False)
+            serializer.is_valid(raise_exception=True)
             serializer.save()
 
         if request.data.get('level'):
@@ -399,9 +417,9 @@ class DetailSubmitData(views.APIView):
             images = data.pop('images')
             instance = Image.objects.filter(pereval=pk)
             if len(images) != len(instance):
-                return response.Response({'state': 0,
-                                          'message': 'Количество загружаемых объектов превышает количество объектов, '
-                                                     'находящихся в базе данных'})
+                return response.Response(data={'status': status.HTTP_500_INTERNAL_SERVER_ERROR,
+                                               'message': 'Count data not equal instance'},
+                                         status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
             for counter, data in enumerate(images):
                 for instance_counter, instance_data in enumerate(instance):
@@ -416,5 +434,7 @@ class DetailSubmitData(views.APIView):
         serializer.is_valid(raise_exception=True)
         serializer.save()
 
-        return response.Response({'state': 1,
-                                  'message': 'success'})
+        return response.Response(data={'status': status.HTTP_200_OK,
+                                       'message': 'Success',
+                                       'result': {f'data #{pk}': serializer}},
+                                 status=status.HTTP_200_OK)
