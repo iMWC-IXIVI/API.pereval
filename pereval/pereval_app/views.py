@@ -20,28 +20,45 @@ class SubmitData(views.APIView):
                                                 type=OpenApiTypes.EMAIL)],
                    description='Поиск пользователя по его email!!!',
                    responses=OpenApiResponse(response=PerevalSerializer,
-                                             description='Пример вывода данных',
-                                             examples=[OpenApiExample(name='Test',
-                                                                      summary='Вывод',
+                                             description='Вывод перевела по email пользователя',
+                                             examples=[OpenApiExample(name='Вывод объяснение',
+                                                                      value={'id': 'Уникальный номер',
+                                                                             'status': 'Статус модерации',
+                                                                             'beauty_title': 'Главное название',
+                                                                             'title': 'Название',
+                                                                             'other_title': 'Альтернативное название',
+                                                                             'connect': 'То что соединяет перевал',
+                                                                             'add_time': 'Время добавления',
+                                                                             'user': 'Добавивший пользователь',
+                                                                             'coords': 'Координаты перевала',
+                                                                             'level': 'Уровень прохождения 2 символа',
+                                                                             'images': 'Список добавленных фотографий'}
+                                                                      ),
+                                                       OpenApiExample(name='Вывод типов данных',
                                                                       value={'id': 'integer',
                                                                              'status': 'string',
                                                                              'beauty_title': 'string',
                                                                              'title': 'string',
                                                                              'other_title': 'string',
+                                                                             'connect': 'string',
                                                                              'add_time': 'datetime',
-                                                                             'coords': {'id': 'integer',
-                                                                                        'latitude': 'float',
+                                                                             'user': {'email': 'string email',
+                                                                                      'fam': 'string',
+                                                                                      'name': 'string',
+                                                                                      'otc': 'string',
+                                                                                      'phone': 'string'},
+                                                                             'coords': {'latitude': 'float',
                                                                                         'longitude': 'float',
                                                                                         'height': 'integer'},
-                                                                             'level': {'winter': 'string',
-                                                                                       'summer': 'string',
-                                                                                       'autumn': 'string',
-                                                                                       'spring': 'string'},
-                                                                             'images': [{'data': 'image',
+                                                                             'level': {'winter': 'string 2 symbol',
+                                                                                       'summer': 'string 2 symbol',
+                                                                                       'autumn': 'string 2 symbol',
+                                                                                       'spring': 'string 2 symbol'},
+                                                                             'images': [{'data': 'File (image)',
                                                                                          'title': 'string'}]
                                                                              }
                                                                       )
-                                                       ],
+                                                       ]
                                              )
                    )
     def get(self, request, *args, **kwargs):
@@ -191,6 +208,50 @@ class SubmitData(views.APIView):
 
 
 class DetailSubmitData(views.APIView):
+
+    @extend_schema(responses=OpenApiResponse(response=PerevalSerializer,
+                                             description='Вывод перевела по его уникальному номеру',
+                                             examples=[OpenApiExample(name='Вывод объяснение',
+                                                                      value={'Список уникальных номеров записей': f'{Pereval.objects.values("pk").order_by("pk")}',
+                                                                             'id': 'Уникальный номер',
+                                                                             'status': 'Статус модерации',
+                                                                             'beauty_title': 'Главное название',
+                                                                             'title': 'Название',
+                                                                             'other_title': 'Альтернативное название',
+                                                                             'connect': 'То что соединяет перевал',
+                                                                             'add_time': 'Время добавления',
+                                                                             'user': 'Добавивший пользователь',
+                                                                             'coords': 'Координаты перевала',
+                                                                             'level': 'Уровень прохождения 2 символа',
+                                                                             'images': 'Список добавленных фотографий'}
+                                                                      ),
+                                                       OpenApiExample(name='Вывод типов данных',
+                                                                      value={'id': 'integer',
+                                                                             'status': 'string',
+                                                                             'beauty_title': 'string',
+                                                                             'title': 'string',
+                                                                             'other_title': 'string',
+                                                                             'connect': 'string',
+                                                                             'add_time': 'datetime',
+                                                                             'user': {'email': 'string email',
+                                                                                      'fam': 'string',
+                                                                                      'name': 'string',
+                                                                                      'otc': 'string',
+                                                                                      'phone': 'string'},
+                                                                             'coords': {'latitude': 'float',
+                                                                                        'longitude': 'float',
+                                                                                        'height': 'integer'},
+                                                                             'level': {'winter': 'string 2 symbol',
+                                                                                       'summer': 'string 2 symbol',
+                                                                                       'autumn': 'string 2 symbol',
+                                                                                       'spring': 'string 2 symbol'},
+                                                                             'images': [{'data': 'File (image)',
+                                                                                         'title': 'string'}]
+                                                                             }
+                                                                      )
+                                                       ]
+                                             )
+                   )
     def get(self, request, *args, **kwargs):
 
         pk = kwargs.get('pk')
