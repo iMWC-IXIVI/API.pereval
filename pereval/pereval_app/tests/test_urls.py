@@ -43,6 +43,50 @@ class CreateData:
 
         return {'user': user, 'coords': coords, 'level': level, 'pereval': pereval, 'images': images}
 
+    def user_create(self):
+        user = PerUser.objects.create(email='test@test.test',
+                                      fam='Testing',
+                                      name='Test',
+                                      otc='Testingovich',
+                                      phone='+7 800 555 35 35')
+        return user
+
+    def cords_create(self):
+        coords = Cords.objects.create(latitude=45.3842,
+                                      longitude=7.1525,
+                                      height=1200)
+        return coords
+
+    def level_create(self):
+        level = Level.objects.create(winter='',
+                                     summer='1A',
+                                     autumn='1A',
+                                     spring='')
+        return level
+
+    def pereval_create(self):
+        user = PerUser.objects.create(email='test@test.test',
+                                      fam='Testing',
+                                      name='Test',
+                                      otc='Testingovich',
+                                      phone='+7 800 555 35 35')
+        coords = Cords.objects.create(latitude=45.3842,
+                                      longitude=7.1525,
+                                      height=1200)
+        level = Level.objects.create(winter='',
+                                     summer='1A',
+                                     autumn='1A',
+                                     spring='')
+        pereval = Pereval.objects.create(beauty_title='пер.',
+                                         title='Пхия',
+                                         other_titles='Триев',
+                                         connect='',
+                                         add_time='2021-09-22 13:18:13',
+                                         user=user,
+                                         coords=coords,
+                                         level=level)
+        return pereval
+
 
 class ViewsGetTestCase(APITestCase, CreateData):
 
@@ -53,23 +97,23 @@ class ViewsGetTestCase(APITestCase, CreateData):
         self.assertEqual(result.status_code, status.HTTP_200_OK)
 
         static_data = {
-            'id': 2,
+            'id': 4,
             'status': 'new',
             'beauty_title': 'пер.',
             'title': 'Пхия',
             'other_titles': 'Триев',
             'connect': '',
             'add_time': '2021-09-22T13:18:13',
-            'coords': {'id': 2,
+            'coords': {'id': 5,
                        'latitude': 45.3842,
                        'longitude': 7.1525,
                        'height': 1200},
-            'level': {'id': 2,
+            'level': {'id': 5,
                       'winter': '',
                       'summer': '1A',
                       'autumn': '1A',
                       'spring': ''},
-            'images': [{'id': 2,
+            'images': [{'id': 3,
                         'data': '/images/test_image.jpg',
                         'title': 'Test'}]
         }
@@ -83,29 +127,29 @@ class ViewsGetTestCase(APITestCase, CreateData):
         self.assertEqual(result.status_code, status.HTTP_200_OK)
 
         static_data = {
-            'id': 1,
+            'id': 3,
             'status': 'new',
             'beauty_title': 'пер.',
             'title': 'Пхия',
             'other_titles': 'Триев',
             'connect': '',
             'add_time': '2021-09-22T13:18:13',
-            'user': {'id': 1,
+            'user': {'id': 4,
                      'email': 'test@test.test',
                      'fam': 'Testing',
                      'name': 'Test',
                      'otc': 'Testingovich',
                      'phone': '+7 800 555 35 35'},
-            'coords': {'id': 1,
+            'coords': {'id': 4,
                        'latitude': 45.3842,
                        'longitude': 7.1525,
                        'height': 1200},
-            'level': {'id': 1,
+            'level': {'id': 4,
                       'winter': '',
                       'summer': '1A',
                       'autumn': '1A',
                       'spring': ''},
-            'images': [{'id': 1,
+            'images': [{'id': 2,
                         'data': '/images/test_image.jpg',
                         'title': 'Test'}]
         }
