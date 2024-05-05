@@ -95,8 +95,7 @@ class SubmitData(views.APIView):
             for image in images:
                 del image['pereval']
 
-        return response.Response(data={email: serializer,
-                                       'status': status.HTTP_200_OK,
+        return response.Response(data={'status': status.HTTP_200_OK,
                                        'message': 'Success',
                                        'result': {email: serializer}},
                                  status=status.HTTP_200_OK)
