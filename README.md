@@ -46,7 +46,9 @@ DATABASES = {
    1. Для начала перейти в дерриктория с файлом manage.py: `cd pereval`;
    2. Запустить тесты: `python manage.py test`;
    
-Все, проект полностью готов к работе.
+Все, проект полностью готов к работе, запуск проекта:
+1. Перейти в дирректорию с файлом manage.py: `cd pereval`
+2. Запустить сервер: `python manage.py runserver`
 ___
 ## _URLPATTERNS_ and _SWAGGER_
 ___
