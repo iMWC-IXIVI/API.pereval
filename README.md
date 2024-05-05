@@ -66,5 +66,16 @@ urlpatterns = [
     path('api/schema/swagger-ui/', views.SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
 ]
 ```
+```python
+from django.urls import path
+
+from .views import SubmitData, DetailSubmitData
+
+
+urlpatterns = [
+    path('submitData/', SubmitData.as_view(), name='submit_post_api'),
+    path('submitData/<int:pk>/', DetailSubmitData.as_view(), name='detail_patch_api'),
+]
+```
 Пример: если вы развернули проекта локально, 
 то путь до документации [SWAGGER](http://127.0.0.1:8000/api/schema/swagger-ui/), не забудьте запустить сервер.
