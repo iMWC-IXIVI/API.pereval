@@ -124,7 +124,7 @@ class ViewGetEmailTestCase(APITestCase, CreateData):
                         'data': '/images/test_image.jpg',
                         'title': 'Test'}]
         }
-        response_data = result.data[data['user'].email][0]
+        response_data = result.data['result'][data['user'].email][0]
         self.assertEqual(response_data, static_data)
         data['images'].data.delete(save=True)
 
