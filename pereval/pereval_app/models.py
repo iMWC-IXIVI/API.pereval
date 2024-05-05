@@ -21,7 +21,7 @@ class PerUser(models.Model):
     fam = models.CharField(max_length=100)
     name = models.CharField(max_length=100)
     otc = models.CharField(max_length=255)
-    phone = models.CharField(unique=True)
+    phone = models.CharField(unique=True, max_length=255)
 
 
 class Cords(models.Model):

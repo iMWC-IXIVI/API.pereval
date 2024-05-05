@@ -78,4 +78,5 @@ urlpatterns = [
 ]
 ```
 Пример: если вы развернули проекта локально, 
-то путь до документации [SWAGGER](http://127.0.0.1:8000/api/schema/swagger-ui/), не забудьте запустить сервер.
+то путь до документации [SWAGGER](http://127.0.0.1:8000/api/schema/swagger-ui/), не забудьте запустить сервер. 
+Сервер проекта находится [ТУТ](http://tta3k.pythonanywhere.com/api/schema/swagger-ui/#/).
