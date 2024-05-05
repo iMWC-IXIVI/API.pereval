@@ -47,3 +47,24 @@ DATABASES = {
    2. Запустить тесты: `python manage.py test`;
    
 Все, проект полностью готов к работе.
+___
+## _URLPATTERNS_ and _SWAGGER_
+___
+В проекте подключен SWAGGER для удобного тестирования API. Все возможные паттерны проекта:
+```python
+from django.contrib import admin
+from django.urls import path, include
+
+from drf_spectacular import views
+
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('', include('pereval_app.urls')),
+
+    path('api/schema/', views.SpectacularAPIView.as_view(), name='schema'),
+    path('api/schema/swagger-ui/', views.SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
+]
+```
+Пример: если вы развернули проекта локально, 
+то путь до документации [SWAGGER](http://127.0.0.1:8000/api/schema/swagger-ui/), не забудьте запустить сервер.
