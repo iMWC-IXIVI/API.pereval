@@ -176,7 +176,6 @@ class SubmitData(views.APIView):
                 cords = request.data.pop('coords')
                 level = request.data.pop('level')
                 images = request.data.pop('images')
-            print((type(user), user), (type(cords), cords), (type(level), level), (type(images), images), sep='\n')
         except KeyError as e:
             return response.Response(data={'status': status.HTTP_400_BAD_REQUEST,
                                            'message': f'Error field {e}'},
@@ -207,7 +206,7 @@ class SubmitData(views.APIView):
                 for image in images:
                     image['pereval'] = Pereval.objects.last().pk
                     image_serializer = ImageSerializer(data=image)
-                    image_serializer.is_valid()
+                    image_serializer.is_valid(raise_exception=True)
                     image_serializer.save()
         except Exception as e:
             return response.Response(data={'status': status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -447,5 +446,5 @@ class DetailSubmitData(views.APIView):
 
         return response.Response(data={'status': status.HTTP_200_OK,
                                        'message': 'Success',
-                                       'result': {f'data #{pk}': serializer}},
+                                       'result': {f'data #{pk}': serializer.data}},
                                  status=status.HTTP_200_OK)

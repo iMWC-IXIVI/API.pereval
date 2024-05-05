@@ -10,6 +10,7 @@ from .test_urls import CreateData
 
 
 class SerializersTestCase(TestCase, CreateData):
+
     def test_user(self):
         data = self.user_create()
         serializer = PerUserSerializer(data).data
