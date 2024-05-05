@@ -9,7 +9,7 @@ from pereval_app.models import Pereval, PerUser, Level, Cords, Image
 
 
 class CreateData:
-
+    """Класс по созданию объектов в базе данных"""
     def data_create(self):
         user = PerUser.objects.create(email='test@test.test',
                                       fam='Testing',
@@ -85,7 +85,7 @@ class CreateData:
 
 
 class ViewGetEmailTestCase(APITestCase, CreateData):
-
+    """Тестирование ответов по введенному в фильтре email"""
     def test_submit_email_100(self):
 
         url = reverse('submit_post_api')
@@ -146,7 +146,7 @@ class ViewGetEmailTestCase(APITestCase, CreateData):
 
 
 class ViewGetPkTestCase(APITestCase, CreateData):
-
+    """Тестирование ответов по введенному уникальному ключу перевала"""
     def test_detail_pk_200(self):
         data = self.data_create()
         result = self.client.get(reverse(viewname='detail_patch_api', kwargs={'pk': data['pereval'].pk}))
@@ -197,6 +197,7 @@ class ViewGetPkTestCase(APITestCase, CreateData):
 
 
 class ViewPostTestCase(APITestCase):
+    """Тест создания перевала"""
     def test_post_400(self):
 
         url = reverse(viewname='submit_post_api')
@@ -264,6 +265,7 @@ class ViewPostTestCase(APITestCase):
 
 
 class ViewPatchTestCase(APITestCase, CreateData):
+    """Тест изменения перевала"""
     def test_patch_400(self):
         data = self.data_create()
         data['pereval'].status = 'not new'

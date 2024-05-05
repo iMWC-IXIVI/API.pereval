@@ -5,29 +5,30 @@ from pathlib import Path
 from dotenv import load_dotenv
 
 
-load_dotenv()
+load_dotenv()  # Загрузка переменных окружения
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = os.getenv('SECRET_KEY')
+SECRET_KEY = os.getenv('SECRET_KEY')  # Ключ DJANGO
 
 DEBUG = True
 
-ALLOWED_HOSTS = [os.getenv('ALLOWED_HOSTS')]
+ALLOWED_HOSTS = [os.getenv('ALLOWED_HOSTS')]  # Список допустимых адресов
 
 INSTALLED_APPS = [
+    # Базовые приложения
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-
+    # Установленные приложения
     'rest_framework',
 
     'drf_spectacular',
     'drf_spectacular_sidecar',
-
+    # Собственные приложения
     'pereval_app.apps.PerevalAppConfig',
 ]
 
@@ -46,7 +47,7 @@ ROOT_URLCONF = 'pereval.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR/'templates'],
+        'DIRS': [BASE_DIR/'templates'],  # Дирректория с шаблонами
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -70,7 +71,7 @@ DATABASES = {
         'NAME': os.getenv('NAME'),
         'PORT': os.getenv('PORT'),
     }
-}
+}  # Настройки базы данных в проекте postgresql
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -87,14 +88,15 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-LANGUAGE_CODE = 'ru'
+LANGUAGE_CODE = 'ru'  # Язык отображения
 
-TIME_ZONE = 'Europe/Moscow'
+TIME_ZONE = 'Europe/Moscow'  # Часовой пояс
 
 USE_I18N = True
 
 USE_TZ = False
 
+# Статик файлы
 STATIC_URL = 'static/'
 STATIC_ROOT = BASE_DIR/'static'
 
@@ -102,9 +104,11 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 SITE_ID = 1
 
+# Медия файлы
 MEDIA_ROOT = BASE_DIR/'images'
 MEDIA_URL = 'images/'
 
+# Настройки django-rest-framework
 REST_FRAMEWORK = {
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
     'DEFAULT_AUTHENTICATION_CLASSES': [],
@@ -115,6 +119,7 @@ REST_FRAMEWORK = {
     ]
 }
 
+# Настройки spectacular (swagger)
 SPECTACULAR_SETTINGS = {
     'TITLE': 'Pereval API',
     'DESCRIPTION': 'Special for FTSR - Pereval',

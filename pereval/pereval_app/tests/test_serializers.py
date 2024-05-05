@@ -1,16 +1,13 @@
-import pdb
-
 from django.test import TestCase
 
 from pereval_app.serializers import (PerUserSerializer, CordsSerializer,
                                      LevelSerializer, PerevalSerializer,
                                      ImageSerializer)
-
 from .test_urls import CreateData
 
 
 class SerializersTestCase(TestCase, CreateData):
-
+    """Тест полей всех сериализаторов"""
     def test_user(self):
         data = self.user_create()
         serializer = PerUserSerializer(data).data

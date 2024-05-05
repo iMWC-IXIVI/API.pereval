@@ -4,7 +4,7 @@ from .constant import NEW, CHOICES_STATUS, CHOICES_LEVEL
 
 
 class Pereval(models.Model):
-
+    """Таблица 'Перевал'"""
     status = models.CharField(max_length=10, choices=CHOICES_STATUS, default=NEW)
     beauty_title = models.CharField(max_length=100)
     title = models.CharField(max_length=100)
@@ -18,6 +18,7 @@ class Pereval(models.Model):
 
 
 class PerUser(models.Model):
+    """Таблица 'Пользователь'"""
     email = models.EmailField(unique=True, max_length=255)
     fam = models.CharField(max_length=100)
     name = models.CharField(max_length=100)
@@ -26,12 +27,14 @@ class PerUser(models.Model):
 
 
 class Cords(models.Model):
+    """Таблица 'Координат'"""
     latitude = models.FloatField()
     longitude = models.FloatField()
     height = models.IntegerField()
 
 
 class Level(models.Model):
+    """Таблица 'Уровень доступности'"""
     winter = models.CharField(max_length=2, choices=CHOICES_LEVEL, null=True, blank=True)
     summer = models.CharField(max_length=2, choices=CHOICES_LEVEL, null=True, blank=True)
     autumn = models.CharField(max_length=2, choices=CHOICES_LEVEL, null=True, blank=True)
@@ -39,7 +42,7 @@ class Level(models.Model):
 
 
 class Image(models.Model):
-
+    """Таблица 'Фотографии'"""
     data = models.ImageField()
     title = models.CharField(max_length=100)
 

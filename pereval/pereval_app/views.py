@@ -14,7 +14,10 @@ from drf_spectacular.utils import (extend_schema, OpenApiParameter, OpenApiExamp
 
 
 class SubmitData(views.APIView):
-
+    """Представление:
+    1. Метод get выводит пользователя по его email, который указан в фильтре;
+    2. Метод post, который создает записи в базе данных;
+    3. Настройка сваггера для методов get и post."""
     @extend_schema(parameters=[OpenApiParameter(name='user__email',
                                                 description='Введите email пользователя',
                                                 type=OpenApiTypes.EMAIL)],
@@ -220,7 +223,10 @@ class SubmitData(views.APIView):
 
 
 class DetailSubmitData(views.APIView):
-
+    """Представление:
+    1. Метод get, который возвращает данные перевала по веденному параметру id (уникальному идентификатору);
+    2. Метод patch, который изменяет данные перевала по веденному параметру id (уникальному идентификатору);
+    3. Настройка свеггера для методов get и patch."""
     @extend_schema(responses=OpenApiResponse(response=PerevalSerializer,
                                              description='Вывод перевела по его уникальному номеру',
                                              examples=[OpenApiExample(name='Вывод объяснение',

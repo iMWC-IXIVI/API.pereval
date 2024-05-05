@@ -4,7 +4,7 @@ from .models import PerUser, Cords, Level, Pereval, Image
 
 
 class PerevalSerializer(serializers.Serializer):
-
+    """Сериализатор перевала"""
     id = serializers.IntegerField(read_only=True)
     status = serializers.CharField(read_only=True)
     beauty_title = serializers.CharField(max_length=100)
@@ -34,7 +34,7 @@ class PerevalSerializer(serializers.Serializer):
 
 
 class PerUserSerializer(serializers.Serializer):
-
+    """Сериализатор пользователя"""
     id = serializers.IntegerField(read_only=True)
     email = serializers.EmailField(max_length=255)
     fam = serializers.CharField(max_length=100)
@@ -47,7 +47,7 @@ class PerUserSerializer(serializers.Serializer):
 
 
 class CordsSerializer(serializers.Serializer):
-
+    """Сериализатор координат"""
     id = serializers.IntegerField(read_only=True)
     latitude = serializers.FloatField()
     longitude = serializers.FloatField()
@@ -68,7 +68,7 @@ class CordsSerializer(serializers.Serializer):
 
 
 class LevelSerializer(serializers.Serializer):
-
+    """Сериализатор уровеня доступности"""
     id = serializers.IntegerField(read_only=True)
     winter = serializers.CharField(max_length=2, allow_null=True, allow_blank=True)
     summer = serializers.CharField(max_length=2, allow_null=True, allow_blank=True)
@@ -91,7 +91,7 @@ class LevelSerializer(serializers.Serializer):
 
 
 class ImageSerializer(serializers.Serializer):
-
+    """Сериализатор фотографий"""
     id = serializers.IntegerField(read_only=True)
     data = serializers.ImageField()
     title = serializers.CharField(max_length=100)
