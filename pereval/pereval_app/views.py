@@ -7,7 +7,6 @@ from .serializers import (PerUserSerializer, CordsSerializer,
                           LevelSerializer, PerevalSerializer,
                           ImageSerializer)
 from .models import PerUser, Cords, Level, Pereval, Image
-from .constant import NEW
 
 from drf_spectacular.utils import (extend_schema, OpenApiParameter, OpenApiExample,
                                    OpenApiResponse, OpenApiTypes)
@@ -397,9 +396,9 @@ class DetailSubmitData(views.APIView):
                                            'message': 'data not found'},
                                      status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-        if Pereval.objects.get(pk=kwargs['pk']).status != NEW:
+        if Pereval.objects.get(pk=kwargs['pk']).status != 'new':
             return response.Response(data={'status': status.HTTP_400_BAD_REQUEST,
-                                           'message': f'status not {NEW}'},
+                                           'message': f'status not new'},
                                      status=status.HTTP_400_BAD_REQUEST)
 
         if data.get('user'):

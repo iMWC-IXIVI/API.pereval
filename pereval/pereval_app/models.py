@@ -1,11 +1,9 @@
 from django.db import models
 
-from .constant import NEW, CHOICES_STATUS, CHOICES_LEVEL
-
 
 class Pereval(models.Model):
     """Таблица 'Перевал'"""
-    status = models.CharField(max_length=10, choices=CHOICES_STATUS, default=NEW)
+    status = models.CharField(max_length=10, default='new')
     beauty_title = models.CharField(max_length=100)
     title = models.CharField(max_length=100)
     other_titles = models.CharField(max_length=100)
@@ -35,10 +33,10 @@ class Cords(models.Model):
 
 class Level(models.Model):
     """Таблица 'Уровень доступности'"""
-    winter = models.CharField(max_length=2, choices=CHOICES_LEVEL, null=True, blank=True)
-    summer = models.CharField(max_length=2, choices=CHOICES_LEVEL, null=True, blank=True)
-    autumn = models.CharField(max_length=2, choices=CHOICES_LEVEL, null=True, blank=True)
-    spring = models.CharField(max_length=2, choices=CHOICES_LEVEL, null=True, blank=True)
+    winter = models.CharField(max_length=2, null=True, blank=True)
+    summer = models.CharField(max_length=2, null=True, blank=True)
+    autumn = models.CharField(max_length=2, null=True, blank=True)
+    spring = models.CharField(max_length=2, null=True, blank=True)
 
 
 class Image(models.Model):
